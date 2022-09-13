@@ -15,5 +15,13 @@ set(TEST_FONT_SHRINKER_EXECUTABLE  ON) #是否编译用来测试font_shrinker动
 cd cmake-build-debug/bin #进入二进制可执行文件目录
 
 #运行可执行文件: ./font_shrinker_test <输入ttf文件> <输出ttf文件> -s <保留的字符合集>
-./font_shrinker_test ../../data/HuaGuangGangTieZhiHei-KeBianTi-2.ttf ../../data/shrinker.ttf -s 老六 ../../data/HuaGuangGangTieZhiHei-KeBianTi-2.ttf ../../data/shrinker.ttf -s 老六
+./font_shrinker_test ../../data/HuaGuangGangTieZhiHei-KeBianTi-2.ttf ../../data/shrinker.ttf -s 老六
+```
+
+把Demo编译关闭则只保留font_shrinker动态库的编译
+```cmake
+set(TEST_FONT_SHRINKER_EXECUTABLE  OFF) #是否编译用来测试font_shrinker动态库接口的二进制可执行文件，对应src/test/font_shrinker_test_main.cc中的main函数
+...
+...
+add_library(font_shrinker SHARED src/font_shrinker.cc)
 ```
