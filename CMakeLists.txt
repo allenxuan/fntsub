@@ -9,6 +9,9 @@ project(font_subsetter)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+set(TEST_FULL_EXECUTABLE  OFF) #是否编译二进制可执行文件，对应src/fntsub/main.cc中的main函数
+set(TEST_FONT_SHRINKER_EXECUTABLE  ON) #是否编译用来测试font_shrinker动态库接口的二进制可执行文件，对应src/test/font_shrinker_test_main.cc中的main函数
+
 # 默认构建Debug版本
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug)
@@ -51,7 +54,7 @@ source_group(table FILES ${SFNTLY_TABLE_COMMON_FILES})
 source_group(table\\bitmap FILES ${SFNTLY_TABLE_BITMAP_FILES})
 source_group(table\\core FILES ${SFNTLY_TABLE_CORE_FILES})
 source_group(table\\truetype FILES ${SFNTLY_TABLE_TTF_FILES})
-add_library(sfntly
+add_library(sfntly STATIC
       	    ${SFNTLY_CORE_FILES}
       	    ${SFNTLY_PORT_FILES}
       	    ${SFNTLY_DATA_FILES}
@@ -73,20 +76,29 @@ if (${APPLE})
 endif ()
 
 file(GLOB SUBTLY_FILES src/subtly/*.h src/subtly/*.cc)
-add_library(subtly ${SUBTLY_FILES})
+add_library(subtly STATIC ${SUBTLY_FILES})
 
 file(GLOB FNTSUB_FILES src/fntsub/*.h src/fntsub/*.cc)
 file(GLOB FNTSUB_MAIN src/fntsub/main.cc)
 list(REMOVE_ITEM FNTSUB_FILES ${FNTSUB_MAIN})
-if(FNTSUB_FILES)
-    add_library(fntsublib ${FNTSUB_FILES})
-endif(FNTSUB_FILES)
-add_executable(fntsub ${FNTSUB_MAIN})
+
+add_library(font_shrinker SHARED src/font_shrinker.cc)
+target_include_directories(font_shrinker PUBLIC
+		include)
 if (${APPLE})
-	target_link_libraries(fntsub subtly sfntly pthread)
+	target_link_libraries(font_shrinker subtly sfntly pthread)
 else ()
-	target_link_libraries(fntsub subtly sfntly icuuc pthread)
+	target_link_libraries(font_shrinker subtly sfntly icuuc pthread)
 endif ()
-if (FNTSUB_FILES)
-    target_link_libraries(fntsub fntsublib)
-endif(FNTSUB_FILES)
+if (TEST_FULL_EXECUTABLE)
+	add_executable(fntsub ${FNTSUB_MAIN})
+	target_link_libraries(fntsub font_shrinker)
+	if(FNTSUB_FILES)
+		add_library(fntsublib STATIC ${FNTSUB_FILES})
+		target_link_libraries(fntsub fntsublib)
+	endif(FNTSUB_FILES)
+endif ()
+if (TEST_FONT_SHRINKER_EXECUTABLE)
+	add_executable(font_shrinker_test src/test/font_shrinker_test_main.cc)
+	target_link_libraries(font_shrinker_test font_shrinker)
+endif ()

@@ -6,7 +6,14 @@ C++实现的对字体进行子集化的小工具
 
 `文章 https://www.veaxen.com/c%E7%89%88%E7%9A%84sfntly-%E5%AD%97%E4%BD%93%E5%AD%90%E9%9B%86%E5%8C%96%E5%B7%A5%E5%85%B7.html`
 
+Cmake中默认编译Demo: 
+```cmake
+set(TEST_FONT_SHRINKER_EXECUTABLE  ON) #是否编译用来测试font_shrinker动态库接口的二进制可执行文件，对应src/test/font_shrinker_test_main.cc中的main函数
+```
+编译成功后运行Demo，如
+```bash
+cd cmake-build-debug/bin #进入二进制可执行文件目录
 
-先编译fntsub
-然后 cd cmake-build-debug/bin
-然后 ./fntsub ../../data/HuaGuangGangTieZhiHei-KeBianTi-2.ttf ../../data/subset/HuaGuangGangTieZhiHei-KeBianTi-2 -s 你好
+#运行可执行文件: ./font_shrinker_test <输入ttf文件> <输出ttf文件> -s <保留的字符合集>
+./font_shrinker_test ../../data/HuaGuangGangTieZhiHei-KeBianTi-2.ttf ../../data/shrinker.ttf -s 老六 ../../data/HuaGuangGangTieZhiHei-KeBianTi-2.ttf ../../data/shrinker.ttf -s 老六
+```
