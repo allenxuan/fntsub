@@ -1,9 +1,13 @@
 # 此CMakeList只支持gcc和clang
-cmake_minimum_required(VERSION 2.6.2)
+#cmake_minimum_required(VERSION 2.6.2)
+cmake_minimum_required(VERSION 3.7)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
 
 # 项目名
 project(font_subsetter)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # 默认构建Debug版本
 if(NOT CMAKE_BUILD_TYPE)
@@ -23,7 +27,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
 # 不使用异常
 add_definitions(-DSFNTLY_NO_EXCEPTION)
 # 设置编译器警告/报错级别
-add_definitions(-D__wur=__attribute__\(\(warn_unused_result\)\) -Wall -Werror -Wno-error=strict-overflow -fno-exceptions)
+#add_definitions(-D__wur=__attribute__\(\(warn_unused_result\)\) -Wall -Werror -Wno-error=strict-overflow -fno-exceptions)
+add_definitions(-D__wur=__attribute__\(\(warn_unused_result\)\) -Wall -Wno-error=strict-overflow -fno-exceptions)
 # 启用C++11
 add_definitions(-std=c++11)
 # 启用CMap和Bitmap
@@ -55,6 +60,17 @@ add_library(sfntly
       	    ${SFNTLY_TABLE_BITMAP_FILES}
       	    ${SFNTLY_TABLE_CORE_FILES}
       	    ${SFNTLY_TABLE_TTF_FILES})
+if (${APPLE})
+	message(STATUS "APPLE = ${APPLE}")
+	message(AUTHOR_WARNING "Make sure you have brew-installed icu4c on your Mac!")
+	set (ICU_ROOT /usr/local/opt/icu4c)
+	find_package(ICU REQUIRED components uc)
+	message(STATUS "ICU_FOUND  = ${ICU_FOUND}")
+	message(STATUS "ICU_INCLUDE_DIRS = ${ICU_INCLUDE_DIRS}")
+	message(STATUS "ICU_INCLUDE_DIRS = ${ICU_LIBRARIES}")
+	target_include_directories(sfntly PUBLIC ${ICU_INCLUDE_DIRS})
+	target_link_libraries(sfntly ${ICU_LIBRARIES})
+endif ()
 
 file(GLOB SUBTLY_FILES src/subtly/*.h src/subtly/*.cc)
 add_library(subtly ${SUBTLY_FILES})
@@ -66,7 +82,11 @@ if(FNTSUB_FILES)
     add_library(fntsublib ${FNTSUB_FILES})
 endif(FNTSUB_FILES)
 add_executable(fntsub ${FNTSUB_MAIN})
-target_link_libraries(fntsub subtly sfntly icuuc pthread)
+if (${APPLE})
+	target_link_libraries(fntsub subtly sfntly pthread)
+else ()
+	target_link_libraries(fntsub subtly sfntly icuuc pthread)
+endif ()
 if (FNTSUB_FILES)
     target_link_libraries(fntsub fntsublib)
 endif(FNTSUB_FILES)

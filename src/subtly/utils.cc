@@ -25,6 +25,7 @@
 #include "sfntly/font_factory.h"
 #include "sfntly/port/file_input_stream.h"
 #include "sfntly/port/memory_output_stream.h"
+#include <string>
 
 namespace subtly {
 using namespace sfntly;

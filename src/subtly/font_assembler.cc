@@ -36,6 +36,8 @@
 #include "sfntly/port/type.h"
 #include "sfntly/port/refcount.h"
 #include "subtly/font_info.h"
+#include <unordered_map>
+#include <string>
 
 namespace subtly {
 using namespace sfntly;

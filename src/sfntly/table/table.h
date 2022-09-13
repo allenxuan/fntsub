@@ -21,6 +21,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <string>
 
 #include "sfntly/port/type.h"
 #include "sfntly/table/font_data_table.h"
